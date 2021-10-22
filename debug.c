@@ -5,7 +5,7 @@
 
 int lineNumber;
 int lineRepeat = 0; // how many types can this line number be applied
-int lineIndex = -2; // where was this line number taken from
+int lineIndex = 0; // where was this line number taken from
 
 void dissassembleChunk(Chunk* chunk, const char* name) {
 	printf("== %s ==\n", name);
@@ -29,9 +29,9 @@ static int constantInstruction(const char* name, Chunk* chunk, int offset) {
 
 int dissassembleInstruction(Chunk* chunk, int offset) {
 	if (!(lineRepeat > 0)) {
-		lineIndex += 2;
 		lineRepeat = chunk->lines[lineIndex];
 		lineNumber = chunk->lines[lineIndex + 1];
+		lineIndex += 2;
 	}
 	lineRepeat--;
 	printf("%04d [Line %d] ", offset, lineNumber);
@@ -40,6 +40,7 @@ int dissassembleInstruction(Chunk* chunk, int offset) {
 		case OP_RETURN:
 			return simpleInstruction("OP_RETURN", offset);
 		case OP_CONSTANT:
+			lineRepeat--;
 			return constantInstruction("OP_CONSTANT", chunk, offset);
 		default:
 			printf("Unknown opcode %d\n", instruction);
