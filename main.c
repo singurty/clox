@@ -11,13 +11,22 @@ int main(int argc, const char* argv[]) {
 	Chunk chunk;
 	initChunk(&chunk);
 
-	int constant = addConstant(&chunk, 1.3);
-	writeChunk(&chunk, OP_CONSTANT, 1);
-	writeChunk(&chunk, constant, 1);
+	int constant = addConstant(&chunk, 4);
+	writeChunk(&chunk, OP_CONSTANT, 123);
+	writeChunk(&chunk, constant, 123);
 
-	writeChunk(&chunk, OP_NEGATE, 2);
+	constant = addConstant(&chunk, 3);
+	writeChunk(&chunk, OP_CONSTANT, 123);
+	writeChunk(&chunk, constant, 123);
 
-	writeChunk(&chunk, OP_RETURN, 3);
+	constant = addConstant(&chunk, 2);
+	writeChunk(&chunk, OP_CONSTANT, 123);
+	writeChunk(&chunk, constant, 123);
+
+	writeChunk(&chunk, OP_MULTIPLY, 123);
+	writeChunk(&chunk, OP_ADD, 123);
+
+	writeChunk(&chunk, OP_RETURN, 123);
 
 	interpret(&chunk);
 	freeVM();
