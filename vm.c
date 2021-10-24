@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "common.h"
 #include "vm.h"
 #include "debug.h"
+#include "compiler.h"
 
 VM vm;
 
@@ -11,6 +13,8 @@ static void resetStack() {
 }
 
 void initVM() {
+	vm.stack = malloc(STACK_MAX);
+	vm.capacity = STACK_MAX;
 	resetStack();
 }
 
@@ -19,11 +23,17 @@ void freeVM() {
 }
 
 void push(Value value) {
+	// expand stack if it'd overflow
+	if ((vm.stack + vm.capacity) == vm.stackTop) {
+		vm.stack = realloc(vm.stack, vm.capacity + vm.capacity / 4);
+		vm.capacity = vm.capacity + vm.capacity / 4;
+	}
 	*vm.stackTop = value;
 	vm.stackTop++;
 }
 
 Value pop() {
+	char* before = (char*) vm.stackTop;
 	vm.stackTop--;
 	return *vm.stackTop;
 }
@@ -61,7 +71,11 @@ push(a op b); \
 				push(constant);
 				break;
 			}
-			case OP_NEGATE: push(-pop()); break;
+			case OP_NEGATE:
+			{
+				vm.stackTop[-1] = -vm.stackTop[-1];
+				break;
+			}
 			case OP_ADD: BINARY_OP(+); break;
 			case OP_SUBTRACT: BINARY_OP(-); break;
 			case OP_MULTIPLY: BINARY_OP(*); break;
@@ -73,8 +87,7 @@ push(a op b); \
 #undef BINARY_OP
 }
 
-InterpretResult interpret(Chunk* chunk) {
-	vm.chunk = chunk;
-	vm.ip = vm.chunk->code;
-	return run();
+InterpretResult interpret(const char* source) {
+	compile(source);
+	return INTERPRET_OK;
 }
