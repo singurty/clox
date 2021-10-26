@@ -16,6 +16,9 @@ static void repl() {
 			printf("\n");
 			break;
 		}
+		InterpretResult result = interpret(line);
+		if (result == INTERPRET_RUNTIME_ERROR) exit(65);
+		if (result == INTERPRET_RUNTIME_ERROR) exit(70);
 	}
 }
 
