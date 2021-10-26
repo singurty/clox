@@ -1,0 +1,51 @@
+Tracing expression: (-1 + 2) * 3 - -4
+advance()
+expression()
+	parsePrecedence(PREC_ASSIGNMENT)
+		getRule(TOKEN_LEFT_PAREN).prefix -> grouping
+		grouping()
+			expression()
+				parsePrecedence(PREC_ASSIGNMENT)
+					getRule(TOKEN_MINUS).prefix -> unary
+					unary()
+						parsePrecedence(PREC_UNARY)
+							getRule(TOKEN_NUMBER).prefix -> number
+							number()
+								emitConstant() -> 1
+							getRule(TOKEN_PLUS).precedence
+						emitByte(OP_NEGATE)
+					getRule(TOKEN_PLUS).precedence
+					getRule(TOKEN_PLUS).infix
+					binary()
+						rule = getRule(TOKEN_PLUS)
+						parsePrecedence(rule.precedence+1)
+							getRule(TOKEN_NUMBER)
+							number()
+								emitConstant() -> 2
+							getRule(TOKEN_RIGHT_PAREN).precedence
+						emitByte(OP_ADD)
+			consume(TOKEN_RIGHT_PAREN)
+		getRule(TOKEN_STAR).precedence
+		getRule(TOKEN_STAR).infix -> binary
+		binary()
+			getRule(TOKEN_STAR)
+			parsePrecedence(PREC_FACTOR+1)
+				getRule(TOKEN_NUMBER).prefix -> number
+				number()
+					emitConstant() -> 3
+				getRule(TOKEN_MINUS).precedence -> PREC_TERM
+			emitByte(OP_MULTIPLY)
+		getRule(TOKEN_MINUS).infix -> binary
+		binary()
+		rule = getRule(TOKEN_MINUS)
+		parsePrecedence(PREC_TERM + 1)
+			getRule(TOKEN_MINUS).prefix -> unary
+			unary()
+				parsePrecedence(PREC_UNARY)
+					getRule(TOKEN_NUMBER).prefix -> number
+					number()
+						emitConstant() -> 4
+				emitByte(OP_NEGATE)
+	emitByte(OP_SUBTRACT)
+	emitByte(OP_MULTIPLY)
+emitByte(OP_RETURN)
