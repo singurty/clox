@@ -34,6 +34,9 @@ typedef enum {
 	//     TOKEN_STRING        " e"
 	TOKEN_INTERPOLATION,
 
+	// Ternary
+	TOKEN_QUESTION, TOKEN_COLON,
+
 	TOKEN_ERROR, TOKEN_EOF
 } TokenType;
 

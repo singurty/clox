@@ -19,6 +19,7 @@ typedef enum {
   PREC_ASSIGNMENT,  // =
   PREC_OR,          // or
   PREC_AND,         // and
+  PREC_TERNARY,     // ?:
   PREC_EQUALITY,    // == !=
   PREC_COMPARISON,  // < > <= >=
   PREC_TERM,        // + -
@@ -134,7 +135,8 @@ static void grouping() {
 
 static void unary() {
 	TokenType operatorType = parser.previous.type;
-	// parser operands that have higher precedence than unary or are unary (nested)
+	// parser operands that have higher precedence than
+	// unary or are unary (nested)
 	parsePrecedence(PREC_UNARY);
 	switch (operatorType) {
 		case TOKEN_MINUS: emitByte(OP_NEGATE); break;
@@ -146,6 +148,9 @@ static void binary() {
 	// left operand is already emitted by parsePrecedence
 	TokenType operatorType = parser.previous.type;
 	ParseRule* rule = getRule(operatorType);
+	// +1 so that so that only tokens that are higher precedence
+	// than this are parsed
+	// 1 + 2 + 3 + 4 should be parsed as ((1 + 2) + 3) + 4
 	parsePrecedence((Precedence)(rule->precedence + 1));
 	switch (operatorType) {
 		case TOKEN_PLUS: emitByte(OP_ADD); break;
@@ -154,6 +159,17 @@ static void binary() {
 		case TOKEN_SLASH: emitByte(OP_DIVIDE); break;
 		default: return;
 	}
+}
+
+static void ternary() {
+	// condition is already emitted by parsePrecedence
+
+	// parse if expression
+	parsePrecedence(PREC_TERNARY + 1);
+	consume(TOKEN_COLON, "Expected ':' after if expression.");
+	// parse else expression
+	parsePrecedence(PREC_TERM + 1);
+	emitByte(OP_TERNARY);
 }
 
 ParseRule rules[] = {
