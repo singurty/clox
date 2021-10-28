@@ -23,6 +23,9 @@ void writeChunk(Chunk* chunk, uint8_t byte, int line) {
 	chunk->code[chunk->count] = byte;
 	chunk->count++;
 
+	// ignore line number if this is an operand for OP_CONSTANT
+	if (chunk->code[chunk->count - 1] == OP_CONSTANT) return;
+
 	// Run-length encoding for line numbers
 	if (chunk->lineCount && chunk->lines[chunk->lineCount - 1] == line) {
 		chunk->lines[chunk->lineCount - 2]++;
