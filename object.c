@@ -27,13 +27,13 @@ ObjString* copyString(const char* chars, int length) {
 	return allocateString(heapChars, length);
 }
 
+ObjString* takeString(char* chars, int length) {
+	return allocateString(chars, length);
+}
+
 void printObject(Value value) {
 	switch (OBJ_TYPE(value)) {
 		case OBJ_STRING:
 			printf("%s", AS_CSTRING(value));
 	}
-}
-
-static inline bool isObjType(Value value, ObjType type) {
-	return IS_OBJ(value) && AS_OBJ(value)->type == type;
 }
