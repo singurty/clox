@@ -8,6 +8,7 @@
 #include "debug.h"
 #include "compiler.h"
 #include "object.h"
+#include "memory.h"
 
 VM vm;
 
@@ -23,10 +24,12 @@ void initVM() {
 	vm.stack = malloc(STACK_MAX);
 	vm.capacity = STACK_MAX;
 	resetStack();
+	vm.objects = NULL;
 }
 
 void freeVM() {
 	free(vm.stack);
+	freeObjects();
 }
 
 void push(Value value) {
