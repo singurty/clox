@@ -102,7 +102,7 @@ static Token string() {
 	// consume the terminating quote
 	advance();
 	// the string literal can later be derived
-	// from token.start and token.length
+	// from token.start and token.length (surrounding quotes are included)
 	return makeToken(TOKEN_STRING);
 }
 

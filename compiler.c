@@ -6,6 +6,8 @@
 #include "scanner.h"
 #include "debug.h"
 #include "value.h"
+#include "vm.h"
+#include "object.h"
 
 typedef struct {
 	Token current;
@@ -189,6 +191,10 @@ static void literal() {
 	}
 }
 
+static void string() {
+	emitConstant(OBJ_VAL(copyString(parser.previous.start + 1, parser.previous.length - 2)));
+}
+
 ParseRule rules[] = {
 	[TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},
 	[TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
@@ -212,7 +218,7 @@ ParseRule rules[] = {
 	[TOKEN_QUESTION]      = {NULL,     ternary,PREC_TERNARY},
 	[TOKEN_COLON]         = {NULL,     ternary,PREC_TERNARY},
 	[TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
-	[TOKEN_STRING]        = {NULL,     NULL,   PREC_NONE},
+	[TOKEN_STRING]        = {string,   NULL,   PREC_NONE},
 	[TOKEN_NUMBER]        = {number,   NULL,   PREC_NONE},
 	[TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
 	[TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
